@@ -94,6 +94,18 @@ public final class CoreStatement {
         }
         handleStatement.bind(bindingValue, toIndex: index)
     }
+    
+    public func decode<T: TableDecodable>(
+        _ propertyConvertibleList: [PropertyConvertible],
+        startIndex: Int = 0) throws -> T {
+        var hashedKeys: TableEncoder.HashedKey = [:]
+        for (index, propertyConvertible) in propertyConvertibleList.enumerated() {
+            hashedKeys[propertyConvertible.codingTableKey.stringValue.hashValue] = index + startIndex
+        }
+        
+        let decoder = TableDecoder(hashedKeys, on: recyclableHandleStatement)
+        return try T.init(from: decoder)
+    }
 
     /// The wrapper of `sqlite3_column_*` for getting column decodable value.
     ///
